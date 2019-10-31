@@ -5,12 +5,14 @@ public class ResponseMsg {
     private String msg;
     private int ret;
     private Object data;
-    public ResponseMsg(){
+
+    public ResponseMsg() {
     }
-    public ResponseMsg(String msg,int ret,Object data){
-        this.msg=msg;
-        this.ret=ret;
-        this.data=data;
+
+    public ResponseMsg(String msg, int ret, Object data) {
+        this.msg = msg;
+        this.ret = ret;
+        this.data = data;
     }
 
     public int getRet() {

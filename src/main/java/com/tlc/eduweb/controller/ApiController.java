@@ -1,13 +1,16 @@
 package com.tlc.eduweb.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.tlc.eduweb.modles.entity.*;
 import com.tlc.eduweb.modles.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sun.rmi.runtime.Log;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import static org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -23,6 +26,10 @@ public class ApiController {
     private TheClassRepository theClassRepository;
     @Autowired
     private VipRequestRepository vipRequestRepository;
+    @Autowired
+    private HomeWorkRepository homeWorkRepository;
+    @Autowired
+    private UserHomeWorkRepository userHomeWorkRepository;
     @GetMapping("/login")
     public ResponseMsg login(String account,String password){
         ResponseMsg res=new ResponseMsg();
@@ -103,6 +110,72 @@ public class ApiController {
     public List<TheClass> allTheClass(){
         return theClassRepository.findAll();
     }
+    @GetMapping("/allhomework")
+    public List<HomeWork> allHomeWork(){
+        return homeWorkRepository.findAll();
+    }
+    @GetMapping("/alluserhomework")
+    public List<UserHomeWork> allUserHomeWork(){
+        return userHomeWorkRepository.findAll();
+    }
+    @GetMapping("/userhomework")
+    public List<UserHomeWork> userHomeWork(int id){
+        List<UserHomeWork> userHomeWorks=new ArrayList<>();
+        for (UserHomeWork userHomeWork:userHomeWorkRepository.findAll()) {
+            if (userHomeWork.getHomework() == id) userHomeWorks.add(userHomeWork);
+        }
+        return userHomeWorks;
+    }
+    @GetMapping("/myhomework")
+    public List<UserHomeWork> myHomeWork(String openid){
+        List<UserHomeWork> userHomeWorks=new ArrayList<>();
+        for (UserHomeWork userHomeWork:userHomeWorkRepository.findAll()) {
+            if (userHomeWork.getOpenid().equals(openid)) userHomeWorks.add(userHomeWork);
+        }
+        return userHomeWorks;
+    }
+    @GetMapping("/myclass")
+    public TheClass myClass(String theclass){
+        List<User> users=new ArrayList<>();
+        for (TheClass item:theClassRepository.findAll()) {
+            if (item.getLabel().equals(theclass)) return item;
+        }
+        return null;
+    }
+    @GetMapping("/classhomework")
+    public ResponseMsg classHomeWork(String theclass){
+        if (theclass.isEmpty()){
+            return new ResponseMsg("没有找到班级信息，请退出页面从公众号重新登录",-1,null);
+        }
+        List<HomeWork> classHomeWork=new ArrayList<>();
+        for (HomeWork homework:homeWorkRepository.findAll()) {
+            if(homework.getTheclass().equals(theclass)) {
+               // homework.setDetial(homework.getDetial().replaceAll("\r|\n", "<br/>"));
+                classHomeWork.add(homework);}
+        }
+        return new ResponseMsg("成功",0,classHomeWork);
+    }
+    @RequestMapping("/commenthomework")
+    public ResponseMsg commentHomeWork(int id,String commentadmin,String comment ,String commenttime){
+        ResponseMsg ret=new ResponseMsg();
+        try {
+            UserHomeWork userHomeWork=new UserHomeWork();
+            for (UserHomeWork item:userHomeWorkRepository.findAll()) {
+                if (item.getId() == id) userHomeWork=item;
+                continue;
+            }
+           userHomeWork.setCommentadmin(commentadmin);
+           userHomeWork.setCommenttime(commenttime);
+           userHomeWork.setComment(comment);
+           userHomeWorkRepository.save(userHomeWork);
+        }
+        catch (Exception e){
+            return new ResponseMsg(e.getMessage(),-1,null);
+        }
+        ret.setMsg("存储成功");
+        ret.setRet(0);
+        return ret;
+    }
     @RequestMapping("/saveschool")
     public ResponseMsg saveSchool(@Valid @RequestBody School school){
        ResponseMsg ret=new ResponseMsg();
@@ -121,6 +194,33 @@ public class ApiController {
         ResponseMsg ret=new ResponseMsg();
         try {
             ret.setData(theClassRepository.save(theClass));
+        }
+        catch (Exception e){
+            return new ResponseMsg(e.getMessage(),-1,null);
+        }
+        ret.setMsg("存储成功");
+        ret.setRet(0);
+        return ret;
+    }
+
+    @RequestMapping("/savehomework")
+    public ResponseMsg saveHomeWork(@Valid @RequestBody HomeWork homeWork){
+        ResponseMsg ret=new ResponseMsg();
+        try {
+            ret.setData(homeWorkRepository.save(homeWork));
+        }
+        catch (Exception e){
+            return new ResponseMsg(e.getMessage(),-1,null);
+        }
+        ret.setMsg("存储成功");
+        ret.setRet(0);
+        return ret;
+    }
+    @RequestMapping("/saveuserhomework")
+    public ResponseMsg saveUserHomeWork(@Valid @RequestBody UserHomeWork userhomeWork){
+        ResponseMsg ret=new ResponseMsg();
+        try {
+            ret.setData(userHomeWorkRepository.save(userhomeWork));
         }
         catch (Exception e){
             return new ResponseMsg(e.getMessage(),-1,null);

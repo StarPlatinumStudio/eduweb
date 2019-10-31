@@ -157,7 +157,6 @@ import java.util.List;
         for (User item:users){
             if(item.getOpenid().equals(openid)) {
                 return item;
-
             }
         }
         String url="https://api.weixin.qq.com/sns/userinfo?access_token="+access_token+"&openid="+openid+"&lang=zh_CN";

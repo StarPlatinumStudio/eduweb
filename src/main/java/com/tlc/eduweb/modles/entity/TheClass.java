@@ -20,11 +20,13 @@ public class TheClass {
     private String detial;
     @Column(name = "school", nullable = false)
     private String school;
-
+    @Column(name = "pictures")
+    private String pictures;
     public TheClass() {
     }
 
-    public TheClass(int id,String label, String value, String detial, String school) {
+    public TheClass(int id,String label, String value, String detial, String school,String pictures) {
+        this.pictures=pictures;
         this.id =id;
         this.label = label;
         this.value = value;
@@ -32,6 +34,13 @@ public class TheClass {
         this.school = school;
     }
 
+    public String getPictures() {
+        return pictures;
+    }
+
+    public void setPictures(String pictures) {
+        this.pictures = pictures;
+    }
     public int getId() {
         return id;
     }

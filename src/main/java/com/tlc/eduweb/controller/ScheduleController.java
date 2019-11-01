@@ -2,6 +2,7 @@ package com.tlc.eduweb.controller;
 
 import com.tlc.eduweb.modles.entity.Schedule;
 import com.tlc.eduweb.modles.repository.ScheduleDao;
+import com.tlc.eduweb.modles.repository.TheClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,18 +18,20 @@ public class ScheduleController {
 
     @Autowired
     ScheduleDao scheduleDao;
+    @Autowired
+    TheClassRepository theClassRepository;
 
     @RequestMapping("/courseBetweenWeek/{id}")
     @ResponseBody
     public List<Schedule> test(@PathVariable Integer id, @RequestParam("dateStart") Date dateStart, @RequestParam("dateEnd") Date dateEnd, @RequestParam("courseType") String courseType) {
-        List<Schedule> byDateBetween = scheduleDao.findByClassIdAndDateBetweenAndType(id, dateStart, dateEnd, courseType);
+        List<Schedule> byDateBetween = scheduleDao.findByClassIdAndDateBetweenAndTypeOrderByDateAscTimeStartAsc(id, dateStart, dateEnd, courseType);
         return byDateBetween;
     }
 
     @RequestMapping("/getClassId")
     @ResponseBody
     public List<Object> getClassId() {
-        List<Object> classIdList = scheduleDao.getClassId();
+        List<Object> classIdList = theClassRepository.getClassId();
         return classIdList;
     }
 

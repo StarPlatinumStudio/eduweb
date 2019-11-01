@@ -11,7 +11,7 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "schedule", path = "schedules")
 public interface ScheduleDao extends JpaRepository<Schedule, Integer> {
 
-    List<Schedule> findByClassIdAndDateBetweenAndType(Integer id, Date dateStart, Date dateEnd, String type);
+    List<Schedule> findByClassIdAndDateBetweenAndTypeOrderByDateAscTimeStartAsc(Integer id, Date dateStart, Date dateEnd, String type);
 
     @Query("SELECT DISTINCT classId FROM Schedule")
     List<Object> getClassId();
